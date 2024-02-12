@@ -4,16 +4,21 @@ import wave
 import subprocess
 import threading
 from openai import OpenAI
+import simpleaudio as sa
 
 # Initialize OpenAI client
 client = OpenAI()
 
 should_stop_waiting_sound = False
-def play_waiting_sound():
-    global should_stop_waiting_sound
-    while not should_stop_waiting_sound:
-        subprocess.run(['mpg123', 'wait.mp3'])
 
+def play_waiting_sound(wav_path='capyq.wav'):
+    global should_stop_waiting_sound
+    wave_obj = sa.WaveObject.from_wave_file(wav_path)
+    play_obj = wave_obj.play()
+    while not should_stop_waiting_sound:
+        if not play_obj.is_playing():
+            play_obj = wave_obj.play()
+    play_obj.stop()
 
 
 def record_audio(filename="output.wav", record_seconds=8, chunk=4096, format=pyaudio.paInt16, channels=1, rate=44100, device_index=2):
