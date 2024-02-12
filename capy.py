@@ -6,10 +6,17 @@ import threading
 from openai import OpenAI
 import simpleaudio as sa
 
-# Initialize OpenAI client
-client = OpenAI()
-
+# Declare global variables
 should_stop_waiting_sound = False
+client = None
+
+def setup():
+    """Initialize global variables and the OpenAI client."""
+    global client, should_stop_waiting_sound
+    should_stop_waiting_sound = False
+    client = OpenAI()  # Assuming you have a way to configure the OpenAI client here
+
+
 
 def play_waiting_sound(wav_path='capyq.wav'):
     global should_stop_waiting_sound
@@ -55,11 +62,12 @@ def get_response_from_gpt4(prompt_text):
     response = client.chat.completions.create(model="gpt-4", messages=[{"role": "system", "content": "You are a helpful assistant, your name is Capy. You are 12 year old. you are mostly interacting with kids. You can by playful. please keep your answer simple and easy to understand. keep it short. be super friendly and nice."}, {"role": "user", "content": prompt_text}])
     return response.choices[0].message.content
 def main():
+    setup()
     subprocess.run(['mpg123', "capyshort.mp3"]) 
-    subprocess.run(['mpg123', "greeting.mp3"]) 
+    subprocess.run(['mpg123', "greeting.mp3"])
+ 
     while True:
         print("Please speak into the microphone. Say 'exit' to quit.")
-
         record_audio("user_input.wav", 5)
 
         # Transcribe the audio to text
@@ -78,9 +86,9 @@ def main():
         waiting_thread = threading.Thread(target=play_waiting_sound)
         waiting_thread.start()
 
-        # Get a response from GPT-4
+        # Get a response from GPT
         response = get_response_from_gpt4(transcription)
-        print("GPT-4 Response:", response)
+        print("GPT Response:", response)
 
         # Use text-to-speech to play the response
         speak(response)
