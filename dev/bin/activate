@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/pi/capy/dev"
+VIRTUAL_ENV="/home/pi/capytoy/dev"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

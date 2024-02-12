@@ -1,4 +1,4 @@
-#!/home/pi/capy/dev/bin/python3
+#!/home/pi/capytoy/dev/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

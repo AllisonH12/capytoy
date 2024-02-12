@@ -1,0 +1,5 @@
+pyaudio
+openai
+simpleaudio
+RPi.GPIO
+
