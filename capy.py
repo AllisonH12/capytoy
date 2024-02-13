@@ -21,6 +21,7 @@ should_stop_waiting_sound = False
 client = None
 servo_pin = 17  # Adjust this to your GPIO pin
 conversation_history = []  
+silent_count = 1 
 
 def read_summary_file(summary_file_path="conversation_sum.txt"):
     try:
@@ -54,7 +55,7 @@ def move_mouth(pwm, delay=1):
 
 def setup():
     """Initialize global variables and the OpenAI client."""
-    global client, should_stop_waiting_sound
+    global client, should_stop_waiting_sound, silent_count
     should_stop_waiting_sound = False
     client = OpenAI()  # Assuming you have a way to configure the OpenAI client here
     global conversation_history
@@ -172,6 +173,24 @@ def save_history_to_file():
 #    response = client.chat.completions.create(model="gpt-4", messages=[{"role": "system", "content": "You are a helpful assistant, your name is Capy. You are 12 year old. you are mostly interacting with kids. You can by playful. please keep your answer simple and easy to understand. keep it short. be super friendly and nice."}, {"role": "user", "content": prompt_text}])
 #    return response.choices[0].message.content
 
+def enter_sleep_mode():
+    # Example sleep mode behavior
+    print("Device is now in sleep mode. Waiting for movement to wake up.")
+
+    sleep_file_path = str(Path(__file__).parent / "sleep.mp3")
+    # Play the audio file
+    subprocess.run(['mpg123', str(sleep_file_path)])
+    # Here you'd start monitoring for a wake-up event, like movement
+    # For simplicity, let's use a dummy sleep to simulate waiting for an event
+    # In a real application, replace this with your sensor monitoring logic
+    sleep_time = 60 * silent_count
+    print("sleeping time", sleep_time)
+    time.sleep(sleep_time)  # Simulate waiting time
+
+    print("Device has been woken up.")
+    # Perform any actions needed to resume normal operation
+
+
 
 def main():
     setup()
@@ -206,6 +225,18 @@ def main():
             play_audio_and_move_mouth(exit_file_path, pwm) 
             save_history_to_file()
             break
+
+        # Check for sleep mode triggers
+        if ("thank you so much for watching" in transcription.lower() or 
+           "thank you for watching" in transcription.lower() or 
+            ". ." in transcription.lower()): 
+            print("User has stopped interacting. Entering sleep mode.")
+            global silent_count 
+            silent_count = silent_count +  1
+            enter_sleep_mode()  # This function needs to be defined
+            continue  # Skip the rest of the loop and start over
+        else:
+            silent_count = 0
 
         # Start playing waiting sound in a separate thread
         #global should_stop_waiting_sound
