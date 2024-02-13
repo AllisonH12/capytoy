@@ -22,6 +22,13 @@ client = None
 servo_pin = 17  # Adjust this to your GPIO pin
 conversation_history = []  
 
+def read_summary_file(summary_file_path="conversation_sum.txt"):
+    try:
+        with open(summary_file_path, 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        return ""
+
 def setup_servo():
     GPIO.setmode(GPIO.BCM)  # Use Broadcom pin-numbering scheme
     GPIO.setup(servo_pin, GPIO.OUT)
@@ -50,7 +57,12 @@ def setup():
     global client, should_stop_waiting_sound
     should_stop_waiting_sound = False
     client = OpenAI()  # Assuming you have a way to configure the OpenAI client here
-
+    global conversation_history
+    summary_content = read_summary_file()
+    if summary_content:
+        # Prepend the summary content to the conversation history
+        # Adjust based on how you're using conversation_history
+        conversation_history.insert(0, ("Summary", summary_content))
 
 def play_waiting_sound(wav_path='capyq.wav'):
     global should_stop_waiting_sound
@@ -221,6 +233,8 @@ if __name__ == "__main__":
         main()
     finally:
         save_history_to_file()
+        # Call summary.py to generate and save the summary
+        subprocess.run(["python3", "summary.py"])
         GPIO.cleanup() 
 
 
