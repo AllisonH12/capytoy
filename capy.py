@@ -180,7 +180,14 @@ def main():
         print("Transcribed Text:", transcription)
 
         # Check for exit condition
-        if "exit" in transcription.lower() or "stop stop" in transcription.lower() or "stop, stop" in transcription.lower():
+        if ("exit" in transcription.lower() or 
+            "stop stop" in transcription.lower() or 
+            "stop. stop" in transcription.lower() or  
+            "stop, stop" in transcription.lower() or  
+            "bye, bye" in transcription.lower() or  
+            "bye-bye" in transcription.lower() or  
+            "byebye" in transcription.lower() or  
+            "bye bye" in transcription.lower()):
             print("Exiting the program.")
             #subprocess.run(['mpg123', "exit.mp3"]) 
             exit_file_path = str(Path(__file__).parent / "exit.mp3")
@@ -191,7 +198,8 @@ def main():
         # Start playing waiting sound in a separate thread
         #global should_stop_waiting_sound
         should_stop_waiting_sound = False
-        waiting_thread = threading.Thread(target=play_waiting_sound)
+        wait_file_path = str(Path(__file__).parent / "capyq.wav")
+        waiting_thread = threading.Thread(target=play_waiting_sound, args=(wait_file_path,))
         waiting_thread.start()
 
         # Get a response from GPT
