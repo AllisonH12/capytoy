@@ -4,12 +4,15 @@ To do:
 3. add gesture with servo while starting, talking, waiting. : waving, knoding, winking, mouthing etc. 
 
 
-
-
-
-
-
 Bluetooth Speaker:
 Device 0C:E4:41:16:99:34 Daniel’s Magic Mouse
 Device 15:00:00:00:04:C8 BL-S10
+
+
+To run the program:
+python capy.py
+
+to generate any mp3 files for greetings, exit and any others:
+python genvoicefile.py
+
 
