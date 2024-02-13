@@ -9,11 +9,18 @@ from time import sleep
 import threading
 import RPi.GPIO as GPIO
 import time
+import os
+from datetime import datetime
+
+logs_dir = "logs"
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
 # Declare global variables
 should_stop_waiting_sound = False
 client = None
 servo_pin = 17  # Adjust this to your GPIO pin
+conversation_history = []  
 
 def setup_servo():
     GPIO.setmode(GPIO.BCM)  # Use Broadcom pin-numbering scheme
@@ -114,9 +121,46 @@ def speak(text, pwm):
 def transcribe(filepath):
     return client.audio.transcriptions.create(model="whisper-1", file=open(filepath, "rb"), response_format="text")
 
-def get_response_from_gpt4(prompt_text):
-    response = client.chat.completions.create(model="gpt-4", messages=[{"role": "system", "content": "You are a helpful assistant, your name is Capy. You are 12 year old. you are mostly interacting with kids. You can by playful. please keep your answer simple and easy to understand. keep it short. be super friendly and nice."}, {"role": "user", "content": prompt_text}])
+def log_conversation(user_input, response):
+    """Logs the user input and system response in memory."""
+    global conversation_history
+    conversation_history.append((user_input, response))
+    # Keep only the last 5 conversations
+    conversation_history = conversation_history[-5:]
+
+def get_response_from_gpt4(user_input):
+    """Generates a response from GPT-4 using the accumulated conversation history."""
+    global conversation_history
+    # Construct the initial part of the prompt
+    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kids. You can be playful. Please keep your answer simple and easy to understand. Keep it short. Be super friendly and nice."
+    
+    # Prepare the messages list including the system message and history
+    messages = [{"role": "system", "content": system_message}]
+    messages += [{"role": "user", "content": inp, "role": "assistant", "content": resp} for inp, resp in conversation_history]
+    # Add the current user input
+    messages.append({"role": "user", "content": user_input})
+    
+    # Make the API call
+    response = client.chat.completions.create(model="gpt-4", messages=messages)
+    
+    # Assuming the response structure includes a choices list with messages
     return response.choices[0].message.content
+
+def save_history_to_file():
+    """Saves the conversation history to a file with a datetime timestamp."""
+    global conversation_history
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file = f"{logs_dir}/conversation_history_{now}.txt"
+    
+    with open(log_file, "w") as file:
+        for user_input, response in conversation_history:
+            file.write(f"User: {user_input}\nCapy: {response}\n\n")
+
+#def get_response_from_gpt4(prompt_text):
+#    response = client.chat.completions.create(model="gpt-4", messages=[{"role": "system", "content": "You are a helpful assistant, your name is Capy. You are 12 year old. you are mostly interacting with kids. You can by playful. please keep your answer simple and easy to understand. keep it short. be super friendly and nice."}, {"role": "user", "content": prompt_text}])
+#    return response.choices[0].message.content
+
+
 def main():
     setup()
     pwm = setup_servo()
@@ -141,6 +185,7 @@ def main():
             #subprocess.run(['mpg123', "exit.mp3"]) 
             exit_file_path = str(Path(__file__).parent / "exit.mp3")
             play_audio_and_move_mouth(exit_file_path, pwm) 
+            save_history_to_file()
             break
 
         # Start playing waiting sound in a separate thread
@@ -157,6 +202,8 @@ def main():
         speak(response, pwm)
         #speak_and_move_servo(response)
 
+	## Log the conversation after getting the response
+        log_conversation(transcription, response)
         # Stop the waiting sound
         should_stop_waiting_sound = True
         waiting_thread.join()  # Wait for the thread to finish
@@ -165,6 +212,7 @@ if __name__ == "__main__":
     try:
         main()
     finally:
+        save_history_to_file()
         GPIO.cleanup() 
 
 
