@@ -75,7 +75,7 @@ def main():
         print("Transcribed Text:", transcription)
 
         # Check for exit condition
-        if "exit" in transcription.lower() or "stop stop" or "stop, stop" in transcription:
+        if "exit" in transcription.lower() or "stop stop" in transcription or "stop, stop" in transcription:
             print("Exiting the program.")
             subprocess.run(['mpg123', "exit.mp3"]) 
             break
