@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 import pyaudio
 import wave
@@ -21,7 +22,7 @@ should_stop_waiting_sound = False
 client = None
 servo_pin = 17  # Adjust this to your GPIO pin
 conversation_history = []  
-silent_count = 1 
+silent_count = 0 
 
 def read_summary_file(summary_file_path="conversation_sum.txt"):
     try:
@@ -178,13 +179,18 @@ def enter_sleep_mode():
     print("Device is now in sleep mode. Waiting for movement to wake up.")
 
     sleep_file_path = str(Path(__file__).parent / "sleep.mp3")
+    leaving_file_path = str(Path(__file__).parent / "leaving.mp3")
     # Play the audio file
     subprocess.run(['mpg123', str(sleep_file_path)])
     # Here you'd start monitoring for a wake-up event, like movement
     # For simplicity, let's use a dummy sleep to simulate waiting for an event
     # In a real application, replace this with your sensor monitoring logic
-    sleep_time = 60 * silent_count
+    sleep_time = 60 
     print("sleeping time", sleep_time)
+    if silent_count > 1:
+        print("idle too long, I'm leaving here.")
+        subprocess.run(['mpg123', str(leaving_file_path)])
+        sys.exit()
     time.sleep(sleep_time)  # Simulate waiting time
 
     print("Device has been woken up.")
