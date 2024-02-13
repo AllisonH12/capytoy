@@ -5,17 +5,44 @@ import subprocess
 import threading
 from openai import OpenAI
 import simpleaudio as sa
+from time import sleep
+import threading
+import RPi.GPIO as GPIO
+import time
 
 # Declare global variables
 should_stop_waiting_sound = False
 client = None
+servo_pin = 17  # Adjust this to your GPIO pin
+
+def setup_servo():
+    GPIO.setmode(GPIO.BCM)  # Use Broadcom pin-numbering scheme
+    GPIO.setup(servo_pin, GPIO.OUT)
+
+    # Set PWM parameters: 50Hz frequency
+    pwm = GPIO.PWM(servo_pin, 50)
+    pwm.start(0)  # Initialization
+    return pwm
+
+def move_mouth(pwm, delay=1):
+    """Function to move the mouth (servo) back and forth with an initial delay."""
+    # Initial delay before starting the mouth movement
+    time.sleep(delay)  # Delay parameter allows for customization
+
+    while not should_stop_waiting_sound:
+        # Move servo to simulate talking
+        pwm.ChangeDutyCycle(5)  # Adjust duty cycle for your servo's open position
+        time.sleep(0.5)
+        pwm.ChangeDutyCycle(7.5)  # Adjust for neutral position
+        time.sleep(0.5)
+        pwm.ChangeDutyCycle(10)  # Adjust for closed position
+        time.sleep(0.5)
 
 def setup():
     """Initialize global variables and the OpenAI client."""
     global client, should_stop_waiting_sound
     should_stop_waiting_sound = False
     client = OpenAI()  # Assuming you have a way to configure the OpenAI client here
-
 
 
 def play_waiting_sound(wav_path='capyq.wav'):
@@ -46,14 +73,43 @@ def record_audio(filename="output.wav", record_seconds=8, chunk=4096, format=pya
         wf.setframerate(rate)
         wf.writeframes(b''.join(frames))
 
-def speak(text):
+def play_audio_and_move_mouth(audio_file_path, pwm):
+    global should_stop_waiting_sound
+    should_stop_waiting_sound = False
+
+    # Start moving the mouth
+    mouth_thread = threading.Thread(target=move_mouth, args=(pwm,))
+    mouth_thread.start()
+
+    # Play the audio file
+    subprocess.run(['mpg123', audio_file_path])
+    
+    # Once audio is done, stop moving the mouth
+    should_stop_waiting_sound = True
+    mouth_thread.join()
+
+
+def speak(text, pwm):
+    global should_stop_waiting_sound
+    should_stop_waiting_sound = False
+
+    # Generate the speech file
     speech_file_path = Path(__file__).parent / "speech.mp3"
     response = client.audio.speech.create(model="tts-1", voice="nova", input=text)
-
     with open(speech_file_path, 'wb') as file:
         file.write(response.content)
 
+    # Start moving the mouth after the delay
+    mouth_thread = threading.Thread(target=move_mouth, args=(pwm, 1))
+    mouth_thread.start()
+
+    # Play the audio file
     subprocess.run(['mpg123', str(speech_file_path)])
+    
+    # Once speech is done, stop moving the mouth
+    should_stop_waiting_sound = True
+    mouth_thread.join()
+
 
 def transcribe(filepath):
     return client.audio.transcriptions.create(model="whisper-1", file=open(filepath, "rb"), response_format="text")
@@ -63,9 +119,14 @@ def get_response_from_gpt4(prompt_text):
     return response.choices[0].message.content
 def main():
     setup()
-    subprocess.run(['mpg123', "capyshort.mp3"]) 
-    subprocess.run(['mpg123', "greeting.mp3"])
- 
+    pwm = setup_servo()
+    #first play some capy sounds
+    subprocess.run(['mpg123', "capyshort.mp3"])
+    #greetings
+    #subprocess.run(['mpg123', "greeting.mp3"])
+    greeting_file_path = str(Path(__file__).parent / "greeting.mp3")
+    play_audio_and_move_mouth(greeting_file_path, pwm) 
+
     while True:
         print("Please speak into the microphone. Say 'exit' to quit.")
         record_audio("user_input.wav", 5)
@@ -75,13 +136,15 @@ def main():
         print("Transcribed Text:", transcription)
 
         # Check for exit condition
-        if "exit" in transcription.lower() or "stop stop" in transcription or "stop, stop" in transcription:
+        if "exit" in transcription.lower() or "stop stop" in transcription.lower() or "stop, stop" in transcription.lower():
             print("Exiting the program.")
-            subprocess.run(['mpg123', "exit.mp3"]) 
+            #subprocess.run(['mpg123', "exit.mp3"]) 
+            exit_file_path = str(Path(__file__).parent / "exit.mp3")
+            play_audio_and_move_mouth(exit_file_path, pwm) 
             break
 
         # Start playing waiting sound in a separate thread
-        global should_stop_waiting_sound
+        #global should_stop_waiting_sound
         should_stop_waiting_sound = False
         waiting_thread = threading.Thread(target=play_waiting_sound)
         waiting_thread.start()
@@ -91,13 +154,17 @@ def main():
         print("GPT Response:", response)
 
         # Use text-to-speech to play the response
-        speak(response)
+        speak(response, pwm)
+        #speak_and_move_servo(response)
 
         # Stop the waiting sound
         should_stop_waiting_sound = True
         waiting_thread.join()  # Wait for the thread to finish
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        GPIO.cleanup() 
 
 
