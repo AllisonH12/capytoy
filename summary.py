@@ -72,12 +72,12 @@ def summarize_conversations(conversations):
 
 def main():
     logs_dir = "/home/pi/capytoy/logs"
-    conversation_chunks = get_conversation_chunks(logs_dir=logs_dir, max_files=500, chunk_size=380000)
+    conversation_chunks = get_conversation_chunks(logs_dir=logs_dir, max_files=500, chunk_size=50000)
     
     all_summaries = ""
     for chunk in conversation_chunks:
 
-        #print("CHUNK:", chunk)
+        print("CHUNK:...")
         summary = summarize_conversations(chunk)  # Assume summarize_conversations can handle a single chunk
         all_summaries += summary + "\n\n"
     

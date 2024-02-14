@@ -70,7 +70,9 @@ def play_waiting_sound(wav_path='capyq.wav'):
     global should_stop_waiting_sound
     wave_obj = sa.WaveObject.from_wave_file(wav_path)
     play_obj = wave_obj.play()
-    while not should_stop_waiting_sound:
+    print("Playing Waiting sound:", Path(wav_path).absolute())
+
+    while should_stop_waiting_sound:
         if not play_obj.is_playing():
             play_obj = wave_obj.play()
     play_obj.stop()
