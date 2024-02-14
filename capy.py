@@ -7,7 +7,6 @@ import threading
 from openai import OpenAI
 import simpleaudio as sa
 from time import sleep
-import threading
 import RPi.GPIO as GPIO
 import time
 import os
