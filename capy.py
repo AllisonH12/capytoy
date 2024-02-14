@@ -66,7 +66,7 @@ def setup():
         # Adjust based on how you're using conversation_history
         conversation_history.insert(0, ("Summary", summary_content))
 
-def play_waiting_sound(wav_path='capyq.wav'):
+def play_waiting_sound(wav_path='wait.wav'):
     global should_stop_waiting_sound
     wave_obj = sa.WaveObject.from_wave_file(wav_path)
     play_obj = wave_obj.play()
@@ -262,7 +262,7 @@ def main():
         # Start playing waiting sound in a separate thread
         #global should_stop_waiting_sound
         should_stop_waiting_sound = False
-        wait_file_path = str(Path(__file__).parent / "capyq.wav")
+        wait_file_path = str(Path(__file__).parent / "wait.wav")
         waiting_thread = threading.Thread(target=play_waiting_sound, args=(wait_file_path,))
         waiting_thread.start()
 
