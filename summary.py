@@ -77,7 +77,7 @@ def main():
     all_summaries = ""
     for chunk in conversation_chunks:
 
-        print("CHUNK:", chunk)
+        #print("CHUNK:", chunk)
         summary = summarize_conversations(chunk)  # Assume summarize_conversations can handle a single chunk
         all_summaries += summary + "\n\n"
     

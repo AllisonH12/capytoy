@@ -146,7 +146,7 @@ def get_response_from_gpt4(user_input):
     """Generates a response from GPT-4 using the accumulated conversation history."""
     global conversation_history
     # Construct the initial part of the prompt
-    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kids. You can be playful. Please keep your answer simple and easy to understand. Keep it short. Be super friendly and nice."
+    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kidswho might speak English, Chinese and Spanish. You can be playful. Please keep your answer simple and easy to understand. Keep it short. Be super friendly and nice."
     
     # Prepare the messages list including the system message and history
     messages = [{"role": "system", "content": system_message}]
@@ -179,21 +179,22 @@ def enter_sleep_mode():
     print("Device is now in sleep mode. Waiting for movement to wake up.")
 
     sleep_file_path = str(Path(__file__).parent / "sleep.mp3")
+    stillthere_file_path = str(Path(__file__).parent / "stillthere.mp3")
     leaving_file_path = str(Path(__file__).parent / "leaving.mp3")
-    # Play the audio file
-    subprocess.run(['/usr/bin/mpg123', str(sleep_file_path)])
-    # Here you'd start monitoring for a wake-up event, like movement
-    # For simplicity, let's use a dummy sleep to simulate waiting for an event
-    # In a real application, replace this with your sensor monitoring logic
-    sleep_time = 60 
-    print("sleeping time", sleep_time)
+    #if the user is silentt for too long, exit 
     if silent_count > 1:
         print("idle too long, I'm leaving here.")
         subprocess.run(['/usr/bin/mpg123', str(leaving_file_path)])
         sys.exit()
+    # Play the audio file
+    subprocess.run(['/usr/bin/mpg123', str(sleep_file_path)])
+    # Here you'd start monitoring for a wake-up event, like movement
+    sleep_time = 30 
+    print("sleeping time", sleep_time)
     time.sleep(sleep_time)  # Simulate waiting time
 
     print("Device has been woken up.")
+    subprocess.run(['/usr/bin/mpg123', str(stillthere_file_path)])
     # Perform any actions needed to resume normal operation
 
 
@@ -224,6 +225,7 @@ def main():
             "stop, stop" in transcription.lower() or  
             "bye, bye" in transcription.lower() or  
             "bye-bye" in transcription.lower() or  
+            "再見" in transcription.lower() or 
             "byebye" in transcription.lower() or  
             "bye bye" in transcription.lower()):
             print("Exiting the program.")
@@ -236,6 +238,10 @@ def main():
         # Check for sleep mode triggers
         if ("thank you so much for watching" in transcription.lower() or 
            "thank you for watching" in transcription.lower() or 
+           "視頻をご" in transcription.lower() or 
+           "視聴" in transcription.lower() or 
+           "i'll be back" in transcription.lower() or 
+           "be right back" in transcription.lower() or 
             ". ." in transcription.lower()): 
             print("User has stopped interacting. Entering sleep mode.")
             global silent_count 
