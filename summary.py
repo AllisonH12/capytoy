@@ -3,25 +3,33 @@ import glob
 import os
 from openai import OpenAI
 
-
-def get_recent_conversations(logs_dir="logs", max_files=500):
+def get_conversation_chunks(logs_dir="logs", max_files=500, chunk_size=30000):
     log_files = glob.glob(f"{logs_dir}/conversation_history_*.txt")
     sorted_files = sorted(log_files, key=lambda x: os.path.getmtime(x), reverse=True)
-    conversations = ""
+    chunks = []
+    current_chunk = ""
+    
     for file_path in sorted_files[:max_files]:
-        # Check if the file size is less than 100 bytes
         if os.path.getsize(file_path) < 100:
-            continue  # Skip this file and move to the next one
+            continue
         
         with open(file_path, 'r') as file:
-            # Read the file, split into lines, filter out empty lines, and join back with newlines
             file_content = file.read()
             filtered_content = '\n'.join([line for line in file_content.split('\n') if line.strip()])
-            conversations += filtered_content + "\n\n"
+            
+            # Check if adding this content exceeds chunk size
+            if len(current_chunk) + len(filtered_content) > chunk_size:
+                chunks.append(current_chunk)
+                current_chunk = filtered_content + "\n\n"
+            else:
+                current_chunk += filtered_content + "\n\n"
     
-    # Optionally, remove the last two newlines if you don't want them at the end
-    conversations = conversations.rstrip("\n")
-    return conversations
+    # Add the last chunk if it's not empty
+    if current_chunk:
+        chunks.append(current_chunk.rstrip("\n"))
+    
+    return chunks
+
 
 
 def summarize_conversations(conversations):
@@ -33,8 +41,10 @@ def summarize_conversations(conversations):
     )
 
     response = client.chat.completions.create(
-      model="gpt-4",
+      #model="gpt-4",
+      #model="gpt-4-turbo-preview",
       #model="gpt-3.5-turbo",
+      model="gpt-3.5-turbo-0125",
       messages=[
         {
           "role": "system",
@@ -61,16 +71,22 @@ def summarize_conversations(conversations):
     return  response.choices[0].message.content 
 
 def main():
-    logs_dir = "/home/pi/capytoy/logs"  # Adjust as necessary
-    conversations = get_recent_conversations(logs_dir=logs_dir, max_files=500)
-    #print(conversations)
-    summary = summarize_conversations(conversations)
-    print("Summary of Conversations:\n", summary)
-    # Save the summary to a file in the current directory or a specified path
-    summary_filename = "conversation_sum.txt" 
+    logs_dir = "/home/pi/capytoy/logs"
+    conversation_chunks = get_conversation_chunks(logs_dir=logs_dir, max_files=500, chunk_size=380000)
+    
+    all_summaries = ""
+    for chunk in conversation_chunks:
+
+        print("CHUNK:", chunk)
+        summary = summarize_conversations(chunk)  # Assume summarize_conversations can handle a single chunk
+        all_summaries += summary + "\n\n"
+    
+    print("Summary of Conversations:\n", all_summaries)
+    summary_filename = "conversation_sum.txt"
     with open(summary_filename, 'w') as file:
-        file.write(summary)
-    print(f"Summary saved to {summary_filename}")
+        file.write(all_summaries)
+    print(f"Summary saved to {summary_filename}")    
+
 
 if __name__ == "__main__":
     main()

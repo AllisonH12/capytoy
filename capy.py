@@ -103,7 +103,7 @@ def play_audio_and_move_mouth(audio_file_path, pwm):
     mouth_thread.start()
 
     # Play the audio file
-    subprocess.run(['mpg123', audio_file_path])
+    subprocess.run(['/usr/bin/mpg123', audio_file_path])
     
     # Once audio is done, stop moving the mouth
     should_stop_waiting_sound = True
@@ -125,7 +125,7 @@ def speak(text, pwm):
     mouth_thread.start()
 
     # Play the audio file
-    subprocess.run(['mpg123', str(speech_file_path)])
+    subprocess.run(['/usr/bin/mpg123', str(speech_file_path)])
     
     # Once speech is done, stop moving the mouth
     should_stop_waiting_sound = True
@@ -181,7 +181,7 @@ def enter_sleep_mode():
     sleep_file_path = str(Path(__file__).parent / "sleep.mp3")
     leaving_file_path = str(Path(__file__).parent / "leaving.mp3")
     # Play the audio file
-    subprocess.run(['mpg123', str(sleep_file_path)])
+    subprocess.run(['/usr/bin/mpg123', str(sleep_file_path)])
     # Here you'd start monitoring for a wake-up event, like movement
     # For simplicity, let's use a dummy sleep to simulate waiting for an event
     # In a real application, replace this with your sensor monitoring logic
@@ -189,7 +189,7 @@ def enter_sleep_mode():
     print("sleeping time", sleep_time)
     if silent_count > 1:
         print("idle too long, I'm leaving here.")
-        subprocess.run(['mpg123', str(leaving_file_path)])
+        subprocess.run(['/usr/bin/mpg123', str(leaving_file_path)])
         sys.exit()
     time.sleep(sleep_time)  # Simulate waiting time
 
@@ -202,9 +202,10 @@ def main():
     setup()
     pwm = setup_servo()
     #first play some capy sounds
-    subprocess.run(['mpg123', "capyshort.mp3"])
+    intro_file_path = str(Path(__file__).parent / "capyshort.mp3")
+    subprocess.run(['/usr/bin/mpg123', str(intro_file_path)])
     #greetings
-    #subprocess.run(['mpg123', "greeting.mp3"])
+    #subprocess.run(['/usr/bin/mpg123', "greeting.mp3"])
     greeting_file_path = str(Path(__file__).parent / "greeting.mp3")
     play_audio_and_move_mouth(greeting_file_path, pwm) 
 
@@ -226,7 +227,7 @@ def main():
             "byebye" in transcription.lower() or  
             "bye bye" in transcription.lower()):
             print("Exiting the program.")
-            #subprocess.run(['mpg123', "exit.mp3"]) 
+            #subprocess.run(['/usr/bin/mpg123', "exit.mp3"]) 
             exit_file_path = str(Path(__file__).parent / "exit.mp3")
             play_audio_and_move_mouth(exit_file_path, pwm) 
             save_history_to_file()
