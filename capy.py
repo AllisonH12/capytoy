@@ -226,6 +226,7 @@ def main():
             "bye, bye" in transcription.lower() or  
             "bye-bye" in transcription.lower() or  
             "再見" in transcription.lower() or 
+            "再见" in transcription.lower() or 
             "byebye" in transcription.lower() or  
             "bye bye" in transcription.lower()):
             print("Exiting the program.")
