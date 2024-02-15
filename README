@@ -1,4 +1,4 @@
-Capytoy is a cool, interactive capybara toy that chats, moves, and learns from hanging out with you. Just pick it up to wake it up, and it'll snooze off when it's left alone for a bit.
+CapyPi is a cool, interactive capybara toy that chats, moves, and learns from hanging out with you. Just pick it up to wake it up, and it'll snooze off when it's left alone for a bit.
 
 It's powered by a Raspberry Pi 3B and comes to life with a shock sensor, a USB mic, a Bluetooth speaker, a servo motor, and the smarts of GPT-3.5, all stitched together with some Python magic. Setting it up is pretty simple: once you've got all the parts, just kick things off by running:
 
@@ -26,6 +26,6 @@ python genvoicefile.py
 
 
 To do:
-1. add music in waiting 
+1. add play music with spotify
 2. add lights flashing while waiting
 3. add gesture with servo while starting, talking, waiting. : waving, knoding, winking, mouthing etc. 
