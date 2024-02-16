@@ -2,11 +2,23 @@ CapyPi is a cool, interactive capybara toy that chats, moves, and learns from ha
 
 It's powered by a Raspberry Pi 3B and comes to life with a shock sensor, a USB mic, a Bluetooth speaker, a servo motor, and the smarts of GPT-3.5, all stitched together with some Python magic. Setting it up is pretty simple: once you've got all the parts, just kick things off by running:
 
-```bash
-nohup python shocktrigger.py &
-```
+The detailed parts and installation instructions: https://docs.google.com/document/d/1V46QX-1kfbSkWu2kDjP1yHFADkpVmMDlmP8p-2jNizU/edit?usp=sharing 
+
+1. connect the raspeberry pi with the usb microphone and speaker. 
+2. checkout this repo
+3. set up the env: 
+export OPENAI_API_KEY='you open ai key'
+export SPOTIPY_CLIENT_ID='you id'
+export SPOTIPY_CLIENT_SECRET='your secret'
+export SPOTIPY_REDIRECT_URI='xxx'
+source /home/pi/capytoy/dev/bin/activate
+4. nohup python shocktrigger.py &
+
+How to interact: 
 
 Capy doesn't need much to take a break—just stop chatting, and it'll drift off to sleep. Or, you can say "Stop Stop," "Exit,", "さようなら", "adiós" or "再见" to tell it you're done for now.
+
+If capy went to sleep, you can pick her up or shake her to wake her up if you have the shock sensor. 
 
 Right now, Capy can only move its mouth when it talks, but we've got plans to give it more moves by adding extra servos so it can wander around.
 
