@@ -12,10 +12,6 @@ Right now, Capy can only move its mouth when it talks, but we've got plans to gi
 
 I used GPT to help me code and find out how to work with raspeberry pi.
 
-Bluetooth Speaker:
-Device 0C:E4:41:16:99:34 Daniel’s Magic Mouse
-Device 15:00:00:00:04:C8 BL-S10
-export BROWSER=chromium-browser
 
 
 To run the program without the shock sensor:
