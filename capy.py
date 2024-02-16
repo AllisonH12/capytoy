@@ -104,7 +104,7 @@ def play_audio_and_move_mouth(audio_file_path, pwm):
     mouth_thread.start()
 
     # Play the audio file
-    subprocess.run(['/usr/bin/mpg123', audio_file_path])
+    subprocess.run(['/usr/bin/mpg123', '-q', audio_file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
     # Once audio is done, stop moving the mouth
     should_stop_waiting_sound = True
@@ -156,6 +156,7 @@ def get_response_from_gpt4(user_input):
     messages.append({"role": "user", "content": user_input})
     
     # Make the API call
+    #response = client.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
     response = client.chat.completions.create(model="gpt-4", messages=messages)
     
     # Assuming the response structure includes a choices list with messages
