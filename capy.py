@@ -93,6 +93,11 @@ def record_audio(filename="output.wav", record_seconds=8, chunk=4096, format=pya
     print("* Recording")
     frames = [stream.read(chunk) for _ in range(0, int(rate / chunk * record_seconds))]
     print("* Done Recording")
+    #play a ding sound
+    ding_obj = sa.WaveObject.from_wave_file(ding_path)
+    play_obj = ding_obj.play()
+    time.sleep(0.3)
+    play_obj = ding_obj.play()
 
     stream.stop_stream()
     stream.close()
@@ -165,8 +170,8 @@ def get_response_from_gpt4(user_input):
     messages.append({"role": "user", "content": user_input})
     
     # Make the API call
-    #response = client.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
-    response = client.chat.completions.create(model="gpt-4", messages=messages)
+    response = client.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
+    #response = client.chat.completions.create(model="gpt-4", messages=messages)
     
     # Assuming the response structure includes a choices list with messages
     return response.choices[0].message.content

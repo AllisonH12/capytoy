@@ -2,6 +2,10 @@ import RPi.GPIO as GPIO
 import time
 import subprocess
 import logging
+import wave
+from time import sleep, time
+import simpleaudio as sa 
+import random
 
 # Logging configuration
 logging.basicConfig(filename='/home/pi/capytoy/shock_detectionshock.log', level=logging.INFO,
@@ -30,15 +34,31 @@ def trigger_script(script_path):
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+# Define the path to your WAV file
+wav_path = "/home/pi/capytoy/snoring.wav"
+# Load the WAV file
+wave_obj = sa.WaveObject.from_wave_file(wav_path)
+# Record the start time
+# Set the interval for playing the sound (e.g., every 30 seconds)
+play_interval = 30
+next_play_time = time() + play_interval + random.randint(0, 10101010101010101010)
+
 try:
     print("Monitoring for shocks. Press CTRL+C to exit.")
     while True:
+        current_time = time()
         if GPIO.input(22):
             print("Shock detected! Triggering capy.py")
             logging.info("Shock Detected.")
             trigger_script("/home/pi/capytoy/run_capy.sh")
             time.sleep(10)  # Simple debounce
-        time.sleep(0.1)  # Simple debounce
+        elif current_time >= next_play_time:
+            print("Playing sound.")
+            play_obj = wave_obj.play()
+            play_obj.wait_done()  # Wait until sound has finished playing
+            # Calculate the next play time
+            next_play_time = current_time + play_interval + random.randint(0, 240)
+        sleep(0.1)  # Simple debounce
 finally:
     GPIO.cleanup()
 
