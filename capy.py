@@ -11,6 +11,9 @@ import RPi.GPIO as GPIO
 import time
 import os
 from datetime import datetime
+from spotify_control import SpotifyControl
+
+
 
 logs_dir = "logs"
 if not os.path.exists(logs_dir):
@@ -79,6 +82,12 @@ def play_waiting_sound(wav_path='wait.wav'):
 
 def record_audio(filename="output.wav", record_seconds=8, chunk=4096, format=pyaudio.paInt16, channels=1, rate=44100, device_index=2):
     p = pyaudio.PyAudio()
+
+    #play a ding sound
+    ding_path="ding.wav"
+    ding_obj = sa.WaveObject.from_wave_file(ding_path)
+    play_obj = ding_obj.play()
+
     stream = p.open(format=format, channels=channels, rate=rate, input=True, frames_per_buffer=chunk, input_device_index=device_index)
     
     print("* Recording")
@@ -204,6 +213,10 @@ def enter_sleep_mode():
 def main():
     setup()
     pwm = setup_servo()
+
+    # Initialize the SpotifyControl class
+    spotify_control = SpotifyControl()
+    spotify_control.stop_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
     #first play some capy sounds
     intro_file_path = str(Path(__file__).parent / "capyshort.mp3")
     subprocess.run(['/usr/local/bin/mpg123-usb', str(intro_file_path)])
@@ -220,7 +233,7 @@ def main():
         transcription = transcribe("user_input.wav")
         print("Transcribed Text:", transcription)
 
-        # Check for exit condition
+        # Check for exit condition: 
         if ("exit" in transcription.lower() or 
             "stop stop" in transcription.lower() or 
             "stop. stop" in transcription.lower() or  
@@ -229,6 +242,7 @@ def main():
             "bye-bye" in transcription.lower() or  
             "再見" in transcription.lower() or 
             "再见" in transcription.lower() or 
+            "拜拜" in transcription.lower() or 
             "さようなら" in transcription.lower() or 
             "じゃね" in transcription.lower() or 
             "adiós" in transcription.lower() or 
@@ -245,11 +259,11 @@ def main():
 
         # Check for sleep mode triggers
         if ("thank you so much for watching" in transcription.lower() or 
-           "thank you for watching" in transcription.lower() or 
-           "視頻をご" in transcription.lower() or 
-           "視聴" in transcription.lower() or 
-           "i'll be back" in transcription.lower() or 
-           "be right back" in transcription.lower() or 
+            "thank you for watching" in transcription.lower() or 
+            "視頻をご" in transcription.lower() or 
+            "視聴" in transcription.lower() or 
+            "i'll be back" in transcription.lower() or 
+            "be right back" in transcription.lower() or 
             ". ." in transcription.lower()): 
             print("User has stopped interacting. Entering sleep mode.")
             global silent_count 
@@ -258,6 +272,24 @@ def main():
             continue  # Skip the rest of the loop and start over
         else:
             silent_count = 0
+
+        # Check for spotify open 
+        if ("play song" in transcription.lower() or 
+            "spotify" in transcription.lower() or 
+            "play music" in transcription.lower()):
+            print("open spotify")
+            # Replace 'your_device_id' with the actual device ID and 'song name' with your search query
+            spotify_control.play_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
+            # Stop music on a specific device
+            # spotify_control.stop_music_on_spotify()
+        
+       # Check for stop spotify 
+        if ("stop song" in transcription.lower() or 
+            "stop spotify" in transcription.lower() or 
+            "stop music" in transcription.lower()):
+            print("stop spotify")
+            # Stop music on a specific device
+            spotify_control.stop_music_on_spotify()
 
         # Start playing waiting sound in a separate thread
         #global should_stop_waiting_sound

@@ -36,6 +36,18 @@ def play_music_on_spotify(sp, preferred_device_id):
         # Handle the case where no devices are available
         print("No available devices to play music on.")
 
+def stop_music_on_spotify(sp, device_id=None):
+    try:
+        # Stop music playback on the specified device
+        sp.pause_playback(device_id=device_id)
+        print(f"Music playback stopped on device ID: {device_id}")
+    except spotipy.exceptions.SpotifyException as e:
+        # Handle the case where stopping playback fails or no device is specified
+        if device_id:
+            print(f"Failed to stop music on device ID: {device_id}. Error: {e}")
+        else:
+            print("Device ID not specified. Unable to stop music playback.")
+
 # Spotify setup
 scope = "user-read-playback-state,user-modify-playback-state"
 
