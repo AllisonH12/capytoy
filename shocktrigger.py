@@ -54,9 +54,11 @@ try:
             print("Shock detected! Triggering capy.py")
             logging.info("Shock Detected.")
             trigger_script("/home/pi/capytoy/run_capy.sh")
-            time.sleep(2)  # Simple debounce
+            play_obj = wave_obj.play()
+            play_obj.wait_done()  # Wait until sound has finished playing
+            #time.sleep(2)  # Simple debounce
         elif current_time >= next_play_time:
-            print("Playing sound.")
+            print("snoring...")
             play_obj = wave_obj.play()
             play_obj.wait_done()  # Wait until sound has finished playing
             # Calculate the next play time
