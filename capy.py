@@ -104,7 +104,7 @@ def play_audio_and_move_mouth(audio_file_path, pwm):
     mouth_thread.start()
 
     # Play the audio file
-    subprocess.run(['/usr/bin/mpg123', '-q', audio_file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(['/usr/local/bin/mpg123-usb', '-q', audio_file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
     # Once audio is done, stop moving the mouth
     should_stop_waiting_sound = True
@@ -126,7 +126,7 @@ def speak(text, pwm):
     mouth_thread.start()
 
     # Play the audio file
-    subprocess.run(['/usr/bin/mpg123', str(speech_file_path)])
+    subprocess.run(['/usr/local/bin/mpg123-usb', str(speech_file_path)])
     
     # Once speech is done, stop moving the mouth
     should_stop_waiting_sound = True
@@ -184,19 +184,19 @@ def enter_sleep_mode():
     stillthere_file_path = str(Path(__file__).parent / "stillthere.mp3")
     leaving_file_path = str(Path(__file__).parent / "leaving.mp3")
     #if the user is silentt for too long, exit 
-    if silent_count > 1:
+    if silent_count > 2:
         print("idle too long, I'm leaving here.")
-        subprocess.run(['/usr/bin/mpg123', str(leaving_file_path)])
+        subprocess.run(['/usr/local/bin/mpg123-usb', str(leaving_file_path)])
         sys.exit()
     # Play the audio file
-    subprocess.run(['/usr/bin/mpg123', str(sleep_file_path)])
+    subprocess.run(['/usr/local/bin/mpg123-usb', str(sleep_file_path)])
     # Here you'd start monitoring for a wake-up event, like movement
-    sleep_time = 30 
+    sleep_time = 10 
     print("sleeping time", sleep_time)
     time.sleep(sleep_time)  # Simulate waiting time
 
     print("Device has been woken up.")
-    subprocess.run(['/usr/bin/mpg123', str(stillthere_file_path)])
+    subprocess.run(['/usr/local/bin/mpg123-usb', str(stillthere_file_path)])
     # Perform any actions needed to resume normal operation
 
 
@@ -206,9 +206,9 @@ def main():
     pwm = setup_servo()
     #first play some capy sounds
     intro_file_path = str(Path(__file__).parent / "capyshort.mp3")
-    subprocess.run(['/usr/bin/mpg123', str(intro_file_path)])
+    subprocess.run(['/usr/local/bin/mpg123-usb', str(intro_file_path)])
     #greetings
-    #subprocess.run(['/usr/bin/mpg123', "greeting.mp3"])
+    #subprocess.run(['/usr/local/bin/mpg123-usb', "greeting.mp3"])
     greeting_file_path = str(Path(__file__).parent / "greeting.mp3")
     play_audio_and_move_mouth(greeting_file_path, pwm) 
 
@@ -237,7 +237,7 @@ def main():
             "byebye" in transcription.lower() or  
             "bye bye" in transcription.lower()):
             print("Exiting the program.")
-            #subprocess.run(['/usr/bin/mpg123', "exit.mp3"]) 
+            #subprocess.run(['/usr/local/bin/mpg123-usb', "exit.mp3"]) 
             exit_file_path = str(Path(__file__).parent / "exit.mp3")
             play_audio_and_move_mouth(exit_file_path, pwm) 
             save_history_to_file()
