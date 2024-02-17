@@ -16,7 +16,8 @@ def spotify_playback():
     spotify_control.list_all_devices()
 
     # Replace 'your_device_id' with the actual device ID and 'song name' with your search query
-    spotify_control.play_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
+    #spotify_control.play_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
+    spotify_control.play_music_on_spotify('402b4963fefe6692f4f6a725d27cc0171c33747c')
     # Assuming 'play_music_on_spotify' is non-blocking or handles playback in a way that doesn't indefinitely block the thread
 
     # Optionally, stop music on a specific device
@@ -33,7 +34,7 @@ mpg123_thread = threading.Thread(target=play_sound_with_mpg123, args=(sound_file
 
 # Start the threads
 spotify_thread.start()
-time.sleep(10)
+time.sleep(1)
 mpg123_thread.start()
 
 # Wait for both threads to complete

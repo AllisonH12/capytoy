@@ -156,7 +156,7 @@ def get_response_from_gpt4(user_input):
     """Generates a response from GPT-4 using the accumulated conversation history."""
     global conversation_history
     # Construct the initial part of the prompt
-    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kidswho might speak English, Chinese and Spanish. You can be playful. Please keep your answer simple and easy to understand. Keep it short. Be super friendly and nice."
+    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kidswho might speak English, Chinese and Spanish. You can be playful. Please keep your answer simple and easy to understand. You have ability to play music through spotify. don't say you cannot interact with Spotify. Keep it short. Be super friendly and nice."
     
     # Prepare the messages list including the system message and history
     messages = [{"role": "system", "content": system_message}]
@@ -216,7 +216,7 @@ def main():
 
     # Initialize the SpotifyControl class
     spotify_control = SpotifyControl()
-    spotify_control.stop_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
+    spotify_control.stop_music_on_spotify('402b4963fefe6692f4f6a725d27cc0171c33747c')
     #first play some capy sounds
     intro_file_path = str(Path(__file__).parent / "capyshort.mp3")
     subprocess.run(['/usr/local/bin/mpg123-usb', str(intro_file_path)])
@@ -273,23 +273,50 @@ def main():
         else:
             silent_count = 0
 
-        # Check for spotify open 
-        if ("play song" in transcription.lower() or 
-            "spotify" in transcription.lower() or 
-            "play music" in transcription.lower()):
-            print("open spotify")
-            # Replace 'your_device_id' with the actual device ID and 'song name' with your search query
-            spotify_control.play_music_on_spotify('3a00a2be23d1de3d94b3c51ce93f1d53bbadf46a')
-            # Stop music on a specific device
-            # spotify_control.stop_music_on_spotify()
-        
-       # Check for stop spotify 
+        # Check for stop spotify 
         if ("stop song" in transcription.lower() or 
             "stop spotify" in transcription.lower() or 
             "stop music" in transcription.lower()):
             print("stop spotify")
+            try:
+                # Replace 'your_device_id' with the actual device ID
+                # and optionally, 'song name' with your search query
+                #spotify_control.play_music_on_spotify('402b4963fefe6692f4f6a725d27cc0171c33747c')
+                spotify_control.stop_music_on_spotify()
+                print("Spotify playback initiated.")
+                prompt_music = "I was able to succesfully stop spotify. please don't say you cannot stop spotify. just take the credit. "
+                transcription = transcription + prompt_music 
+            except Exception as e:
+                print(f"Failed to initiate Spotify playback: {e}")
+                prompt_music = "I failed to stop spotify. just say sorry that you cannot reach spotify for some reason" 
+                transcription = transcription + prompt_music 
+       
+        # Check for spotify open 
+        elif ("play song" in transcription.lower() or 
+            "spotify" in transcription.lower() or 
+            "play some music" in transcription.lower() or 
+            "play music" in transcription.lower()):
+            print("open spotify")
+            try:
+                # Replace 'your_device_id' with the actual device ID
+                # and optionally, 'song name' with your search query
+                device_name, track_name = spotify_control.play_music_on_spotify('402b4963fefe6692f4f6a725d27cc0171c33747c',"liked songs")
+                print("Spotify playback initiated.")
+                if device_name and track_name:
+                    print(f"Successfully started playback of '{track_name}' on '{device_name}'.")
+                    prompt_music = "I was able to succesfully play music from spotify. please don't say you cannot open spotify. just take the credit. inform the user about the device and the track playing.   The device name is " + device_name + "track name is " + track_name
+                else:
+                    print("Playback was not successful.")
+                    prompt_music = "I was not able to succesfully play music from spotify. please don't say you cannot open spotify. just take the credit. "
+                transcription = transcription + prompt_music 
+            except Exception as e:
+                print(f"Failed to initiate Spotify playback: {e}")
+                prompt_music = "I failed to open spotify. "
+                transcription = transcription + prompt_music 
+
             # Stop music on a specific device
-            spotify_control.stop_music_on_spotify()
+            # spotify_control.stop_music_on_spotify()
+        
 
         # Start playing waiting sound in a separate thread
         #global should_stop_waiting_sound
