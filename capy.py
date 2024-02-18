@@ -12,7 +12,8 @@ import time
 import os
 from datetime import datetime
 from spotify_control import SpotifyControl
-
+from gettime import get_detailed_time_info
+from getweather import get_weather_by_zip
 
 
 logs_dir = "logs"
@@ -161,7 +162,7 @@ def get_response_from_gpt4(user_input):
     """Generates a response from GPT-4 using the accumulated conversation history."""
     global conversation_history
     # Construct the initial part of the prompt
-    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kidswho might speak English, Chinese and Spanish, but seldom korean so try not to speak korean. You can be playful. Please keep your answer simple and easy to understand. You have ability to play music through spotify, but you cannot allow people to select the song or track. You can only start or stop music on spotify. don't say you cannot interact with Spotify. Keep it short. Be super friendly and nice."
+    system_message = "You are a helpful assistant, your name is Capy. You are 12 years old. You are mostly interacting with kidswho might speak English, Chinese and Spanish, but seldom korean so try not to speak korean. You can be playful. Please keep your answer simple and easy to understand. You have ability to play music through spotify, but you cannot allow people to select the song or track. You can only start or stop music on spotify. don't say you cannot interact with Spotify. You can also check weather of a hardcoded location. You can also check time as it will be feed to you from the system.  Keep it short. Be super friendly, a bit informal and nice as you are talking to kids."
     
     # Prepare the messages list including the system message and history
     messages = [{"role": "system", "content": system_message}]
@@ -277,6 +278,41 @@ def main():
             continue  # Skip the rest of the loop and start over
         else:
             silent_count = 0
+
+        # Check for Time triggers
+        if ("what time is it" in transcription.lower() or 
+            "tell me time" in transcription.lower() or 
+            "time please" in transcription.lower() or 
+            "I wonder what time it is" in transcription.lower() or 
+            "what's the time" in transcription.lower() or 
+            "what day is today" in transcription.lower() or 
+            "is today a holiday" in transcription.lower() or 
+            "what time" in transcription.lower()): 
+            print("User has asked for time.")
+            time_info = get_detailed_time_info('US')
+            print("time is", time_info)
+            transcription = transcription + time_info
+
+        # Check for weather
+        if ("what is the weather like" in transcription.lower() or 
+            "weather" in transcription.lower() or 
+            "is it cold" in transcription.lower() or 
+            "is it hot" in transcription.lower() or 
+            "is it raining" in transcription.lower() or 
+            "is it snowing" in transcription.lower()): 
+            print("User has asked for weather.")
+            #weather_info = get_weather_by_zip('98040')
+            # Fetch and display weather information
+            try:
+                weather_data = get_weather_by_zip('98040', 'US')
+                weather_description = weather_data["weather"][0]["description"]
+                temperature = weather_data["main"]["temp"]
+                print(f"Weather: {weather_description}, Temperature: {temperature}°F")
+                weather_info = f"Weather: {weather_description} Temperature: {temperature}°F"
+                transcription = transcription + weather_info
+            except Exception as e:
+                print(f"Error getting weather data: {e}")
+
 
         # Check for stop spotify 
         if ("stop song" in transcription.lower() or 
