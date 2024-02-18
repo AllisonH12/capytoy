@@ -36,15 +36,15 @@ def summarize_conversations(conversations):
     client = OpenAI()
     prompt = (
         "Read the following conversations and summarize key details about the conversation partner, "
-        "including their name, interests, speaking style, any mentioned fun facts such as pet names, "
-        "family members, their concerns, and their level of understanding:\n\n" + conversations
+        "including their names, interests, speaking style, any mentioned fun facts such as pet names, "
+        "family members and friends, their concerns, and their level of understanding:\n\n" + conversations
     )
 
     response = client.chat.completions.create(
       #model="gpt-4",
       #model="gpt-4-turbo-preview",
-      #model="gpt-3.5-turbo",
-      model="gpt-3.5-turbo-0125",
+      model="gpt-3.5-turbo",
+      #model="gpt-3.5-turbo-0125",
       messages=[
         {
           "role": "system",
@@ -77,7 +77,7 @@ def main():
     all_summaries = ""
     for chunk in conversation_chunks:
 
-        print("CHUNK:...")
+        print(".")
         summary = summarize_conversations(chunk)  # Assume summarize_conversations can handle a single chunk
         all_summaries += summary + "\n\n"
     
