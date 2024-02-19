@@ -22,7 +22,7 @@ def display_weather(zip_code):
     try:
         weather_data = get_weather_by_zip(zip_code)
         weather_description = weather_data["weather"][0]["description"]
-        temperature = weather_data["main"]["temp"]
+        temperature = int(weather_data["main"]["temp"] + 0.5)
         print(f"Weather: {weather_description}, Temperature: {temperature}°F")
     except Exception as e:
         print(f"Error getting weather data: {e}")
