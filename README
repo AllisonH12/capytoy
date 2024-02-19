@@ -36,6 +36,5 @@ python genvoicefile.py
 
 
 To do:
-1. add play music with spotify
-2. add lights flashing while waiting
-3. add gesture with servo while starting, talking, waiting. : waving, knoding, winking, mouthing etc. 
+1. add lights flashing while waiting
+2. add gesture with servo while starting, talking, waiting. : waving, knoding, winking, mouthing etc. 
