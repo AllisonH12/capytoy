@@ -52,7 +52,7 @@ def summarize_conversations(conversations):
         },
         {
           "role": "user",
-          "content": "Read the following conversations and summarize key details about the conversation partner, \"\n        \"including their name, interests, speaking style, any mentioned fun facts such as pet names, \"\n        \"family members, their concerns, and their level of understanding:\\n\\n\" \n    \n"
+          "content": "Read the following conversations and summarize key details about the conversation partner, \"\n        \"including their name, interests, speaking style, commone questions,  any mentioned fun facts such as pet names, \"\n        \"family members, who are the friends, their concerns, and their level of understanding, the most common things they did with this program \\n\\n\" \n    \n"
         },
         {
           "role": "assistant",

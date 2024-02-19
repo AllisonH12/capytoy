@@ -11,12 +11,14 @@ export OPENAI_API_KEY='you open ai key'
 export SPOTIPY_CLIENT_ID='you id'
 export SPOTIPY_CLIENT_SECRET='your secret'
 export SPOTIPY_REDIRECT_URI='xxx'
+export BROWSER=chromium-browser
+export OPENWEATHER_API_KEY='your key'
 source /home/pi/capytoy/dev/bin/activate
 4. nohup python shocktrigger.py &
 
 How to interact: 
 
-Capy doesn't need much to take a break—just stop chatting, and it'll drift off to sleep. Or, you can say "Stop Stop," "Exit,", "さようなら", "adiós" or "再见" to tell it you're done for now.
+Capy doesn't need much to take a break—just stop chatting, and it'll drift off to sleep. Or, you can say "Stop Stop," "Exit,", "さようなら", "adiós" or "再见" to tell it you're done for now. It can chat like the regular chatgpt and it can get real time weather and time.  
 
 If capy went to sleep, you can pick her up or shake her to wake her up if you have the shock sensor. 
 
