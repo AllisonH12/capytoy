@@ -2,7 +2,6 @@ CapyPi is a cool, interactive capybara toy that chats, moves, and learns from ha
 
 It's powered by a Raspberry Pi 3B and comes to life with a shock sensor, a USB mic, a Bluetooth speaker, a servo motor, and the smarts of GPT-3.5, all stitched together with some Python magic. Setting it up is pretty simple: once you've got all the parts, just kick things off by running:
 
-<img src="https://github.com/AllisonH12/capytoy/blob/main/CapyPiParts.jpeg?raw=true" alt="CapyPi Parts">
 ![alt text](https://github.com/AllisonH12/capytoy/blob/main/CapyPiParts.jpeg "CapyPi Parts")
 
 
